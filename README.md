@@ -1,100 +1,110 @@
 # Endlessabroad Üniversite Veri Çekme Aracı
 
-Bu proje, [Endlessabroad](https://www.endlessabroad.com.tr/) web sitesinden üniversite verilerini çekmek için geliştirilmiş bir web scraper uygulamasıdır.
+Bu proje, [Endlessabroad](https://www.endlessabroad.com.tr/) web sitesinden üniversite verilerini otomatik olarak çekmek ve yapılandırılmış bir formatta kaydetmek için geliştirilmiş bir araçtır.
 
-## Özellikler
+## Proje Özeti
 
-- Tüm üniversiteleri listeler
-- Her üniversitenin detay bilgilerini çeker
-- Konaklama seçeneklerini, programları ve imkanları toplar
-- Verileri JSON ve CSV formatında kaydeder
+Endlessabroad Türkiye'de yurt dışı eğitim danışmanlığı hizmeti veren bir platformdur. Bu proje, sitede listelenen üniversiteler hakkındaki bilgileri otomatik olarak toplar:
+- Üniversite adları ve konumları
+- Program detayları ve ücretler 
+- Kampüs bilgileri
+- Üniversite fotoğrafları
 
-## Kurulum
+## Proje Bileşenleri
 
-1. Gerekli kütüphaneleri yükleyin:
+### Ana Dosyalar
+
+- **fixed_scraper.py**: Selenium ve BeautifulSoup kullanarak üniversite verilerini çeken ana script
+- **check_duplicates.py**: JSON veri dosyasındaki tekrar eden üniversite kayıtlarını tespit eden araç
+- **requirements.txt**: Gerekli kütüphanelerin listesi
+- **README.md**: Proje dokümantasyonu
+
+### Veri Klasörü Yapısı
+
+- **data/**: Ana veri klasörü
+  - **universities_data.json**: Toplanan üniversite verileri (JSON formatında)
+  - **universities_data.csv**: Toplanan üniversite verileri (CSV formatında)
+  - **images/**: İndirilen üniversite fotoğrafları
+
+## Kurulum ve Kullanım
+
+### Gereksinimler
+
+- Python 3.6 veya üzeri
+- Chrome web tarayıcısı (Selenium için)
+- Aşağıdaki Python kütüphaneleri:
+  - requests
+  - beautifulsoup4
+  - lxml
+  - selenium
+  - webdriver-manager
+
+### Kurulum Adımları
+
+1. Depoyu klonlayın:
+```
+git clone https://github.com/0AGP0/Selenium_Scrapping.git
+cd Selenium_Scrapping
+```
+
+2. Gerekli kütüphaneleri yükleyin:
 ```
 pip install -r requirements.txt
 ```
 
-2. Programı çalıştırın:
+### Kullanım
 
-Standart scraper (JavaScript destekli içeriği çekemez):
+1. Üniversite verilerini çekmek için:
 ```
-python scraper.py
-```
-
-Selenium tabanlı scraper (JavaScript destekli dinamik içeriği çekebilir):
-```
-python selenium_scraper.py
+python fixed_scraper.py
 ```
 
-3. Sadece test etmek için:
+2. Veri setinde tekrar eden üniversite kayıtlarını kontrol etmek için:
 ```
-python test_selenium_scraper.py
+python check_duplicates.py
 ```
 
-## Çıktı
+## Teknik Detaylar
 
-Program çalıştırıldığında, `data` klasörü içerisinde iki dosya oluşturulur:
-- `universities_data.json`: Tüm veriler JSON formatında
-- `universities_data.csv`: Tüm veriler CSV formatında
+### fixed_scraper.py
 
-Selenium scraper ayrıca aşağıdaki dosyayı da oluşturur:
-- `universities_partial.json`: İşlem sırasında her 5 üniversitede bir güncellenen yedek dosya
-- `page_source.html`: Sayfa kaynağının analiz için kaydedilmiş hali
+EndlessAbroadScraper sınıfını içerir ve şu adımları gerçekleştirir:
+1. Chrome WebDriver'ı başlatır
+2. Üniversiteler sayfasını açar
+3. "Daha fazla göster" butonuna tıklayarak tüm üniversitelerin yüklenmesini sağlar
+4. Her üniversitenin detay sayfasını ziyaret eder
+5. Aşağıdaki verileri toplar:
+   - Üniversite adı ve konumu
+   - Ücret bilgileri
+   - Kampüs detayları
+   - Program bilgileri
+   - Fotoğraflar
+6. Verileri JSON ve CSV formatında kaydeder
 
-## Selenium vs Standart Scraper
+### check_duplicates.py
 
-Bu projede iki farklı scraper bulunmaktadır:
+Bu script şunları yapar:
+1. JSON veri dosyasını okur
+2. Üniversiteleri isim ve URL'ye göre gruplar
+3. Birden fazla kaydı olan üniversiteleri tespit eder
+4. Tekrar eden kayıtların detaylarını gösterir (URL ve konum bilgileri)
 
-1. **Standart Scraper (`scraper.py`)**: 
-   - Basit `requests` ve `BeautifulSoup` kullanır
-   - JavaScript ile yüklenen içeriği çekemez
-   - Daha az bağımlılık gerektirir
+## Teknik Zorluklar ve Çözümler
 
-2. **Selenium Scraper (`selenium_scraper.py`)**: 
-   - Tarayıcı otomasyonu ile çalışır
-   - JavaScript ile dinamik olarak yüklenen içeriği çekebilir
-   - Daha fazla bağımlılık gerektirir (Chrome/Firefox tarayıcı ve WebDriver)
-   - Sayfadaki etkileşimleri (tıklama, kaydırma vb.) gerçekleştirebilir
+1. **Dinamik Sayfa Yükleme**: Endlessabroad sitesi içeriği dinamik olarak JavaScript ile yüklediğinden, statik HTML çekimi yetersiz kalmaktadır. Bu nedenle Selenium WebDriver kullanılmıştır.
 
-## Test Sonuçları ve Proje Notları
+2. **Etkileşimli Elementler**: "Daha fazla göster" butonuna tıklama gibi etkileşimler için JavaScript executor kullanılmıştır.
 
-Yapılan testler sonucunda edinilen bilgiler:
+3. **Değişken Sayfa Yapısı**: Farklı üniversite sayfalarının farklı yapılarda olabilmesi nedeniyle, çoklu CSS seçiciler ve esnek veri çekme stratejileri uygulanmıştır.
 
-1. Üniversite kartları `.school-card` CSS sınıfı ile işaretlenmiştir
-2. Sayfa başına 20 üniversite kartı gösterilmektedir
-3. Site JavaScript ve dinamik yükleme kullanmaktadır, bu nedenle Selenium tercih edilmelidir
-4. Yaygın kullanılan CSS sınıfları:
-   - `school-card`: Üniversite kartları
-   - `card-icon-text`: Kart içindeki ikonlar
-   - `div-border`: Kenarlık içeren elementler
+4. **Tekrar Eden Kayıtlar**: Aynı üniversitenin farklı kampüsleri için ayrı kayıtlar tutulduğu tespit edilmiştir. `check_duplicates.py` aracı bu durumu analiz etmek için geliştirilmiştir.
 
-## Tespit Edilen Zorluklar
+## Performans Optimizasyonları
 
-1. **Dinamik İçerik**: Site içeriği dinamik olarak JavaScript ile yüklenmektedir. Bu nedenle standart `requests` ve `BeautifulSoup` yaklaşımı yetersiz kalabilir.
+- Yavaş yüklenen sayfalar için akıllı bekleme mekanizmaları
+- Hata durumlarında otomatik yeniden deneme
+- Resim indirme işlemleri için verimli dosya adlandırma sistemleri
 
-2. **WebDriver Kararlılığı**: Selenium WebDriver'ın yüklenmesi ve çalıştırılması bazen sorunlu olabilir, özellikle Windows sistemlerde.
+## Bilgilendirme
 
-3. **CSS Seçicilerin Değişkenliği**: Site güncellendikçe CSS seçiciler değişebilir, bu nedenle düzenli bakım gerekebilir.
-
-## Sorun Giderme
-
-Selenium ile ilgili yaygın sorunlar:
-
-1. **WebDriver Hatası**: Chrome/Firefox WebDriver yüklenirken sorun yaşanıyorsa:
-   - Tarayıcınızı güncellemeyi deneyin
-   - Manuel olarak WebDriver indirin ve PATH çevresel değişkenine ekleyin
-   - Selenium ve webdriver-manager'ı yeniden yükleyin
-
-2. **Bağlantı Zaman Aşımı**: 
-   - `--headless` parametresi kaldırılarak tarayıcıyı görünür modda çalıştırın
-   - Zaman aşımı sürelerini artırın (`time.sleep()` ve `WebDriverWait`)
-
-3. **Element Bulunamadı**:
-   - Sayfa tamamen yüklenmeden önce elementi aramayı deniyorsanız, bekleme süresini artırın
-   - CSS seçicileri doğrulayın (site yapısı değişmiş olabilir)
-
-## Not
-
-Bu araç sadece eğitim amaçlıdır. Web sitesinin kullanım koşullarına uygun olarak kullanılmalıdır. 
+Bu proje yalnızca eğitim amaçlıdır ve kişisel olmayan veri toplamak için geliştirilmiştir. Web sitesinin kullanım koşullarına uygun olarak kullanılması gerekmektedir. Sürekli çalıştırılan toplu veri çekme işlemleri, siteye aşırı yük bindirebilir. 
